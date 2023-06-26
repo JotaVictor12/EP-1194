@@ -1,0 +1,88 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct Node {
+    char data;
+    struct Node* esquerda;
+    struct Node* direita;
+} Node;
+
+Node* novoNo(char data) {
+    Node* no = (Node*)malloc(sizeof(Node));
+    no->data = data;
+    no->esquerda = NULL;
+    no->direita = NULL;
+    return no;
+}
+
+int encontrarIndice(char v[], int inicio, int fim, char valor) {
+    int i;
+    for (i = inicio; i <= fim; i++) {
+        if (v[i] == valor)
+            return i;
+    }
+    return -1;
+}
+
+Node* construirArvore(char inFixo[], char preFixo[], int inicio, int fim, int* preIndex) {
+    if (inicio > fim)
+        return NULL;
+
+    Node* no = novoNo(preFixo[*preIndex]);
+    (*preIndex)++;
+
+    if (inicio == fim)
+        return no;
+
+    int inIndex = encontrarIndice(inFixo, inicio, fim, no->data);
+
+    no->esquerda = construirArvore(inFixo, preFixo, inicio, inIndex - 1, preIndex);
+    no->direita = construirArvore(inFixo, preFixo, inIndex + 1, fim, preIndex);
+
+    return no;
+}
+
+void percorrerPosFixo(Node* no) {
+    if (no == NULL)
+        return;
+
+    percorrerPosFixo(no->esquerda);
+
+    percorrerPosFixo(no->direita);
+
+    printf("%c", no->data);
+}
+
+void calcularPercorrerPosFixo(int n, char preFixo[], char inFixo[]) {
+    Node* raiz = NULL;
+    int preIndex = 0;
+
+    raiz = construirArvore(inFixo, preFixo, 0, n - 1, &preIndex);
+
+    percorrerPosFixo(raiz);
+
+    free(raiz);
+}
+
+int main() {
+    int c;
+    scanf("%d", &c);
+
+    while (c--) {
+        int n;
+        scanf("%d", &n);
+
+        char preFixo[n + 1];
+        char inFixo[n + 1];
+
+        scanf("%s", preFixo);
+        scanf("%s", inFixo);
+
+        calcularPercorrerPosFixo(n, preFixo, inFixo);
+
+        printf("\n");
+    }
+
+    return 0;
+}
